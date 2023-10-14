@@ -1,5 +1,5 @@
 import React from 'react'
-import Product from './Product';
+import Product from './Products';
 import bg from '../assets/mega-creator (1).png';
 
 export default function Home() {
