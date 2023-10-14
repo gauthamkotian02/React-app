@@ -1,80 +1,81 @@
-import React, { useState, useEffect, Component } from "react";
+import React,{useState,useEffect} from 'react'
+import { NavLink, useParams } from 'react-router-dom'
+import Skeleton from "react-loading-skeleton";
 
 export default function Product() {
-  const [data, setData] = useState([]);
-  const [filter, setFilter] = useState(data);
-  const [loading, setLoading] = useState(false);
-  let componentMounted = true;
-  useEffect(() => {
-    const getProduct = async () => {
-      setLoading(true);
-      const response = await fetch("https://fakestoreapi.com/products");
+    const {id}=useParams();
+    const [product,setProduct] = useState([]);
+    const [loading,setLoading] =useState(false);
 
-      if (componentMounted) {
-        setData(await response.clone().json());
-        setFilter(await response.json());
-        setLoading(false);
-        console.log(filter);
-      }
-      return () => {
-        componentMounted = false;
-      };
-    };
-    getProduct();
-  }, []);
-  const Loading = () => {
-    return <>Loading.....</>;
-  };
-  const ShowProducts = () => {
-    return (
-      <>
-        <div className="button d-flex justify-content-center mb-5 pb-5">
-          <button className="btn btn-outline-dark me-2">All</button>
-          <button className="btn btn-outline-dark me-2">Mens Clothing</button>
-          <button className="btn btn-outline-dark me-2">Womens Clothing</button>
-          <button className="btn btn-outline-dark me-2">Jewelary</button>
-          <button className="btn btn-outline-dark me-2">Electronics</button>
+useEffect(()=>{
+const getProduct = async () =>{
+    setLoading(true);
+    const response= await fetch(`https://fakestoreapi.com/products/${id}`);
+    setProduct(await response.json());
+    setLoading(false);
+}
+getProduct();
+},[]);
+const Loading =()=>{
+    return(
+        <>
+  <div className="col-md-6">
+     <Skeleton height={400}/>
+     </div>
+        <div className="col-md-6" style={{lineHeight:2}}> 
+        <Skeleton height={50} width={300}/>
+        <Skeleton height={75}/>
+        <Skeleton height={25} width={150}/>
+        <Skeleton height={50} />
+        <Skeleton height={150} />
+        <Skeleton height={50} width={100}/>
+        <Skeleton height={50} width={100}  style={{marginLeft:2}}/>
         </div>
-        {filter.map((product) => {
-          return (
-            <>
-              <div className="col-md-3 mb-4">
-                <div className="card h-100 text-center p-4" key={product.id}>
-                  <img
-                    src={product.image}
-                    class="card-img-top mb-0"
-                    alt={product.title} height="250px"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{product.title.substring(0,12)}...</h5>
-                    <p className="card-text lead fw-bold">
-                      ₹{product.price}
-                    </p>
-                    <a href="#" className="btn btn-outline-dark">
-                     Buy Now
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </>
-          );
-        })}
-      </>
-    );
-  };
+        </>
+    )
+}
+const ShowProduct =()=>{
+    return(
+        <>
+        <div className="col-md-6">
+            <img src={product.image} alt={product.title} height={"400px"} width={"400px"}/>
+        </div>
+        <div className="col-md-6">
+            <h4 className="text-uppercase text-black-50">
+                {
+                    product.category
+                }
+            </h4>
+            <h1 className='display-5'>{product.title}</h1>
+            <p className="lead fw-bolder">
+                Rating {product.rating && product.rating.rate}
+                <i className="fa fa-star"></i>
+            </p>
+                <h3 className="display-6 fw-bolder my-4">
+                    ${product.price}
+                </h3>
+                <p className="lead">
+                    {product.discription}
+                </p>
+
+                <button className="btn btn-outline-dark">
+                    Add to Cart
+                </button>
+                <NavLink to={"/cart"} className="btn btn-dark ms-2 px-3 py-2">
+                    Go to Cart
+                </NavLink>
+        </div>
+        </>
+    )
+}
+
   return (
     <div>
-      <div className="container my-5 py-5">
-        <div className="row">
-          <div className="col-12 mb-5">
-            <h1 className="display-6 fw-bolder text-center">Latest Products</h1>
-            <hr />
-          </div>
+        <div className="container py-5">
+            <div className="row py-4">
+                {loading? <Loading/> : <ShowProduct/>}
+            </div>
         </div>
-        <div className="row justify-content-center">
-          {loading ? <Loading /> : <ShowProducts />}
-        </div>
-      </div>
     </div>
-  );
+  )
 }
